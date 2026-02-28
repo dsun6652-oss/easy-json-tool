@@ -2,6 +2,8 @@
 
 单页面 React 应用，支持 JSON 格式化、压缩、校验、转 CSV 及文件下载。
 
+**在线体验**：<https://dsun6652-oss.github.io/easy-json-tool>
+
 ## 功能
 
 - **格式化**：将压缩的 JSON 美化输出
