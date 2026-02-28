@@ -1,7 +1,9 @@
 import { useState, useCallback, useEffect } from 'react'
+import { useI18n } from './useI18n'
 import './App.css'
 
 function App() {
+  const { t, lang, setLang } = useI18n()
   const [input, setInput] = useState('')
   const [output, setOutput] = useState('')
   const [error, setError] = useState('')
@@ -20,9 +22,19 @@ function App() {
       JSON.parse(input)
       setValidationError('')
     } catch (e) {
-      setValidationError(e.message || 'JSON 语法错误')
+      setValidationError(e.message || t('jsonSyntaxError'))
     }
-  }, [input])
+  }, [input, t])
+
+  // 缩进变更时，若已有 JSON 输出则自动重新格式化
+  useEffect(() => {
+    if (outputMode !== 'json' || !output || !input.trim()) return
+    try {
+      const parsed = JSON.parse(input)
+      const space = indent === 0 ? '\t' : indent
+      setOutput(JSON.stringify(parsed, null, space))
+    } catch {}
+  }, [indent])
 
   const formatJSON = useCallback((minify = false) => {
     setError('')
@@ -39,10 +51,10 @@ function App() {
         : JSON.stringify(parsed, null, space)
       setOutput(formatted)
     } catch (e) {
-      setError(e.message || 'JSON 解析失败')
+      setError(e.message || t('errorParse'))
       setOutput('')
     }
-  }, [input, indent])
+  }, [input, indent, t])
 
   const jsonToCsv = useCallback(() => {
     setError('')
@@ -74,10 +86,10 @@ function App() {
       ]
       setOutput(lines.join('\n'))
     } catch (e) {
-      setError(e.message || '转换失败')
+      setError(e.message || t('errorConvert'))
       setOutput('')
     }
-  }, [input])
+  }, [input, t])
 
   const copyToClipboard = useCallback(async () => {
     if (!output) return
@@ -86,9 +98,9 @@ function App() {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch {
-      setError('复制失败')
+      setError(t('errorCopy'))
     }
-  }, [output])
+  }, [output, t])
 
   const downloadFile = useCallback(() => {
     if (!output) return
@@ -140,39 +152,48 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>JSON 格式化</h1>
-        <p className="subtitle">粘贴、格式化、复制 — 简洁高效</p>
+        <div className="header-top">
+          <h1>{t('title')}</h1>
+          <button
+            className="lang-switcher"
+            onClick={() => setLang(lang === 'zh' ? 'en' : 'zh')}
+            title={lang === 'zh' ? 'Switch to English' : '切换到中文'}
+          >
+            {lang === 'zh' ? 'EN' : '中'}
+          </button>
+        </div>
+        <p className="subtitle">{t('subtitle')}</p>
       </header>
 
       <div className="toolbar">
         <div className="toolbar-left">
           <button onClick={() => formatJSON(false)} className="btn btn-primary">
-            格式化
+            {t('format')}
           </button>
           <button onClick={() => formatJSON(true)} className="btn btn-secondary">
-            压缩
+            {t('minify')}
           </button>
           <button onClick={jsonToCsv} className="btn btn-secondary">
-            转 CSV
+            {t('toCsv')}
           </button>
           <label className="indent-control">
-            <span>缩进</span>
+            <span>{t('indent')}</span>
             <select value={indent} onChange={(e) => setIndent(Number(e.target.value))}>
-              <option value={2}>2 空格</option>
-              <option value={4}>4 空格</option>
-              <option value={0}>Tab</option>
+              <option value={2}>{t('indent2')}</option>
+              <option value={4}>{t('indent4')}</option>
+              <option value={0}>{t('indentTab')}</option>
             </select>
           </label>
         </div>
         <div className="toolbar-right">
           <button onClick={downloadFile} className="btn btn-secondary" disabled={!output}>
-            下载
+            {t('download')}
           </button>
           <button onClick={copyToClipboard} className="btn btn-ghost" disabled={!output}>
-            {copied ? '已复制' : '复制'}
+            {copied ? t('copied') : t('copy')}
           </button>
           <button onClick={clearAll} className="btn btn-ghost">
-            清空
+            {t('clear')}
           </button>
         </div>
       </div>
@@ -187,13 +208,13 @@ function App() {
       <div className="editor-container">
         <div className="panel">
           <div className="panel-header">
-            <span>输入</span>
+            <span>{t('input')}</span>
             {input.trim() && (
               <span
                 className={`validation-badge ${validationError ? 'invalid' : 'valid'}`}
-                title={validationError || 'JSON 语法正确'}
+                title={validationError || t('validSyntax')}
               >
-                {validationError ? validationError : '✓ 语法正确'}
+                {validationError ? validationError : t('validSyntax')}
               </span>
             )}
           </div>
@@ -208,7 +229,7 @@ function App() {
 
         <div className="panel">
           <div className="panel-header">
-            <span>输出</span>
+            <span>{t('output')}</span>
             {output && <span className="output-mode-badge">{outputMode === 'csv' ? 'CSV' : 'JSON'}</span>}
           </div>
           <pre className="panel-output">
@@ -225,23 +246,23 @@ function App() {
                 />
               )
             ) : (
-              <span className="placeholder">格式化或转 CSV 后结果将显示在这里</span>
+              <span className="placeholder">{t('placeholder')}</span>
             )}
           </pre>
         </div>
       </div>
 
       <footer className="footer">
-        <span>支持 JSON 格式化、压缩、实时校验、转 CSV</span>
+        <span>{t('footerDesc')}</span>
         <p className="footer-sponsor">
-          若对你有帮助，欢迎
+          {t('supportAuthor')}
           <a
             href="https://afdian.com/a/sundd1898"
             target="_blank"
             rel="noopener noreferrer"
             className="footer-sponsor-link"
           >
-            支持作者（爱发电）
+            {t('supportLink')}
           </a>
         </p>
       </footer>
