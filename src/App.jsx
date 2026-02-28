@@ -233,6 +233,17 @@ function App() {
 
       <footer className="footer">
         <span>支持 JSON 格式化、压缩、实时校验、转 CSV</span>
+        <p className="footer-sponsor">
+          若对你有帮助，欢迎
+          <a
+            href="https://afdian.com/a/sundd1898"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="footer-sponsor-link"
+          >
+            支持作者（爱发电）
+          </a>
+        </p>
       </footer>
     </div>
   )

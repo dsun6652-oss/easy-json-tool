@@ -242,3 +242,21 @@
   font-size: 0.8rem;
   color: var(--text-secondary);
 }
+
+.footer-sponsor {
+  margin: 0.5rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.footer-sponsor-link {
+  margin-left: 0.25rem;
+  color: var(--accent);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.footer-sponsor-link:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
